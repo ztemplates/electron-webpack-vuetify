@@ -1,0 +1,22 @@
+{
+  "extends": "./node_modules/electron-webpack/tsconfig-base.json",
+  "compilerOptions": {
+    "incremental": true,
+    "lib": [],
+    "strict": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "renderer/*": [
+        "./src/renderer/*"
+      ],
+      "main/*": [
+        "./src/main/*"
+      ],
+    }
+  }
+}
