@@ -1,17 +1,18 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
-import * as path from 'path'
-import { format as formatUrl } from 'url'
+import { app, BrowserWindow, ipcMain } from 'electron'
+import path from 'path'
+import { pathToFileURL } from 'url'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-// global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow: BrowserWindow | null
 
 function createMainWindow() {
   const window = new BrowserWindow({
-    webPreferences: { nodeIntegration: true }
+    webPreferences: { nodeIntegration: true },
+    frame: false,
+    icon: path.join(__static, 'logo.png')
   })
 
   if (isDevelopment) {
@@ -21,13 +22,7 @@ function createMainWindow() {
   if (isDevelopment) {
     window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
   } else {
-    window.loadURL(
-      formatUrl({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file',
-        slashes: true
-      })
-    )
+    window.loadURL(pathToFileURL(path.join(__dirname, 'index.html')).toString())
   }
 
   window.on('closed', () => {
@@ -62,4 +57,17 @@ app.on('activate', () => {
 // create main BrowserWindow when electron is ready
 app.on('ready', () => {
   mainWindow = createMainWindow()
+})
+
+ipcMain.handle('minimize', () => {
+  mainWindow && mainWindow.minimize()
+})
+
+ipcMain.handle('maximize', () => {
+  if (!mainWindow) return
+  mainWindow.isMaximized() ? mainWindow.restore() : mainWindow.maximize()
+})
+
+ipcMain.handle('close', () => {
+  mainWindow && mainWindow.close()
 })
